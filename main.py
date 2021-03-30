@@ -1,7 +1,6 @@
 import requests
 from PIL import Image
 import io
-import random
 
 
 API_KEY = 'JBuGtYcdod8udN03Io2XfuD5FejXbhYvwWUkwE2y'
@@ -20,11 +19,11 @@ def get_mars_image_url_from_nasa(rover):
         photos = resp_dict['photos']
         if not photos:
             continue
-        return [photo['img_src'] for photo in photos]
+        return [photo['img_src'] for photo in photos], sol
 
 
 def get_mars_photo(rover):
-    images_urls = get_mars_image_url_from_nasa(rover)
+    images_urls, sol = get_mars_image_url_from_nasa(rover)
     images = []
     for i, image_url in enumerate(images_urls):
         image_bytes = requests.get(image_url).content
@@ -32,8 +31,9 @@ def get_mars_photo(rover):
         images.append(image.resize((800, 600)))
         print(f'Photo {i + 1} in {image.size} has added...')
     gif = Image.new('RGB', (800, 600), (255, 255, 255))
-    gif.save('mars.gif', 'GIF', append_images=images, loop=0, duration=300, save_all=True)
+    gif.save(f'mars_sol{sol}.gif', 'GIF', append_images=images, loop=0, duration=300, save_all=True)
     print('Done!')
 
 
-get_mars_photo('perseverance')
+if __name__ == '__main__':
+    get_mars_photo('perseverance')
